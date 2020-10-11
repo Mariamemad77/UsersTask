@@ -1,0 +1,13 @@
+/** @format */
+
+export const ListUsers = {
+  PENDING: "LIST_USERS_PENDING",
+  SUCCESS: "LIST_USERS_SUCCESS",
+  FAILED: "LIST_USERS_FAILED",
+};
+
+export const AddUser = {
+  PENDING: "ADD_USER_PENDING",
+  SUCCESS: "ADD_USER_SUCCESS",
+  FAILED: "ADD_USER_FAILED",
+};

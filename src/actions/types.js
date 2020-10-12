@@ -6,8 +6,8 @@ export const ListUsers = {
   FAILED: "LIST_USERS_FAILED",
 };
 
-export const AddUser = {
-  PENDING: "ADD_USER_PENDING",
-  SUCCESS: "ADD_USER_SUCCESS",
-  FAILED: "ADD_USER_FAILED",
+export const CreateUser = {
+  PENDING: "CREATE_USER_PENDING",
+  SUCCESS: "CREATE_USER_SUCCESS",
+  FAILED: "CREATE_USER_FAILED",
 };

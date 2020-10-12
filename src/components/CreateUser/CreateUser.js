@@ -3,10 +3,16 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import "./CreateUser.scss";
-import { Col, Row } from "../../UtilisComponents";
-import { Button, Form, Container } from "react-bootstrap";
-import axios from "axios";
+import { Col, Row } from "../SharedComponents";
+import { Button, Container } from "react-bootstrap";
+
 import LocationPicker from "react-location-picker";
+import * as Yup from "yup";
+
+import { Formik, Form } from "formik";
+import FieldControl from "../../elements/fieldControl";
+
+import { CreateUserAction } from "../../actions/CreateUserAction/CreateUserAction";
 
 const defaultPosition = {
   lat: 27.9878,
@@ -14,239 +20,247 @@ const defaultPosition = {
 };
 
 class CreateUser extends Component {
-  constructor() {
-    super();
-    this.state = {
-      first_name: "",
-      last_name: "",
-      job: "",
-      email: "",
-      address: "",
-      street_address: "",
-      password: "",
-      confirm_password: "",
-      avatar: "",
+  initialValues = {
+    first_name: "",
+    last_name: "",
+    job: "",
+    email: "",
+    address: "",
+    street_address: "",
+    password: "",
+    confirm_password: "",
+    avatar: "",
 
-      address_map: "Kala Pattar Ascent Trail, Khumjung 56000, Nepal",
-      position: {
-        lat: 0,
-        lng: 0,
-      },
-    };
-    this.handleLocationChange = this.handleLocationChange.bind(this);
-  }
+    address_map: "Kala Pattar Ascent Trail, Khumjung 56000, Nepal",
+    position: {
+      lat: 0,
+      lng: 0,
+    },
+  };
+  // this.handleLocationChange = this.handleLocationChange.bind(this);
 
-  handleLocationChange({ position, address_map }) {
-    // Set new location
-    this.setState({ position, address_map });
-    this.changeHandler();
-  }
+  // handlepasswordmatchin = (e) => {
+  //   const value = e.target.value;
+  //   if (value !== e.password) return "Error";
+  // };
 
-  changeHandler = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
+  // handleLocationChange({ position, address_map }) {
+  //   // Set new location
+  //   this.setState({ position, address_map });
+  //   this.onSubmit();
+  // }
+
+  onSubmit = (values) => {
+    console.log("Hello");
+    const { CreateUserAction } = this.props;
+    console.log(values);
+    CreateUserAction(values);
   };
 
-  submitHandler = (e) => {
-    e.preventDefault();
-    console.log(this.state);
-    axios
-      .post("https://reqres.in/api/users", this.state)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  validationSchema = Yup.object({
+    first_name: Yup.string().required("This Field is Required"),
+    last_name: Yup.string().required("This Field is Required"),
+    job: Yup.string().required("This Field is Required"),
+    address: Yup.string().required("This Field is Required"),
+    street_address: Yup.string().required("This Field is Required"),
+    avatar: Yup.string().required("This Field is Required"),
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("This Field is Required"),
 
-  validateEmail(email) {
-    const pattern = /[a-zA-Z0-9]+[\.]?([a-zA-Z0-9]+)?[\@][a-z]{3,9}[\.][a-z]{2,5}/g;
-    const result = pattern.test(email);
-    if (result === true) {
-      this.setState({
-        emailError: false,
-        email: email,
-      });
-    } else {
-      this.setState({
-        emailError: true,
-      });
-    }
-  }
-
-  changeEmailHandler = (e) => {
-    this.validateEmail(this.email);
-    this.setState({ [e.target.name]: e.target.value });
-  };
+    password: Yup.string()
+      .required("This Field is Required")
+      .min(8, "Password is too short - should be 8 chars minimum.")
+      .matches(
+        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+        "Password Must have capital Letter and special charachter"
+      ),
+    confirm_password: Yup.string().oneOf(
+      [Yup.ref("password"), null],
+      "Passwords didn't match"
+    ),
+  });
 
   render() {
-    const {
-      first_name,
-      last_name,
-      job,
-      email,
-      address,
-      street_adress,
-      password,
-      confirm_password,
-      avatar,
-      address_map,
-      position: { lat, lng },
-    } = this.state;
     return (
       <div className="CreateForm">
         <Container fluid>
-          <Form onSubmit={this.submitHandler}>
-            <Row>
-              <Col>
-                <Form.Label className="FormLabel">First Name</Form.Label>
-                <div>
-                  <input
-                    required
-                    className="FormInput"
-                    type="text"
-                    name="first_name"
-                    onChange={this.changeHandler}
-                    value={first_name}
-                  />
-                </div>
-              </Col>
-              <Col>
-                <Form.Label className="FormLabel">Last Name</Form.Label>
-                <div>
-                  <input
-                    required
-                    className="FormInput"
-                    type="text"
-                    name="last_name"
-                    onChange={this.changeHandler}
-                    value={last_name}
-                  />
-                </div>
-              </Col>
-            </Row>
+          <Formik
+            initialValues={this.initialValues}
+            validationSchema={this.validationSchema}
+            onSubmit={this.onSubmit}
+          >
+            <Form method="POST">
+              <Row>
+                <Col>
+                  <div className="form-group">
+                    <FieldControl
+                      control="input"
+                      id="first_name"
+                      type="text"
+                      className="form-control FormInput input-field "
+                      name="first_name"
+                      placeholder="First Name"
+                      required=""
+                      autoComplete="first_name"
+                      autoFocus=""
+                    />
+                  </div>
+                </Col>
+                <Col>
+                  <div className="form-group">
+                    <FieldControl
+                      control="input"
+                      id="last_name"
+                      type="text"
+                      className="form-control FormInput input-field "
+                      name="last_name"
+                      placeholder="Last Name"
+                      required=""
+                      autoComplete="last_name"
+                      autoFocus=""
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <div className="form-group">
+                <FieldControl
+                  control="input"
+                  id="job"
+                  type="text"
+                  className="form-control FormInput input-field "
+                  name="job"
+                  placeholder="Job"
+                  required=""
+                  autoComplete="job"
+                  autoFocus=""
+                />
+              </div>
 
-            <Form.Label className="FormLabel">Job </Form.Label>
-            <div>
-              <input
-                required
-                className="FormInput"
-                type="text"
-                name="job"
-                onChange={this.changeHandler}
-                value={job}
-              />
-            </div>
+              <div className="form-group">
+                <FieldControl
+                  control="input"
+                  id="avatar"
+                  type="file"
+                  className="form-control FormInput input-field "
+                  name="avatar"
+                  placeholder="Avatar"
+                  required=""
+                  autoComplete="avatar"
+                  autoFocus=""
+                  accept="image/*"
+                />
+              </div>
 
-            <Form.Label className="FormLabel">Avatar </Form.Label>
-            <div>
-              <input
-                required
-                onChange={this.changeHandler}
-                label="Avatar"
-                className="position-relative"
-                type="file"
-                name="avatar"
-                value={avatar}
-                accept="image/*"
-              />
-            </div>
-            <Form.Label className="FormLabel">Email address</Form.Label>
-            <div>
-              <input
-                required
-                className="FormInputWidth FormInput"
-                type="email"
-                name="email"
-                onChange={this.changeEmailHandler}
-                value={email}
-              />
-            </div>
+              <div className="form-group">
+                <FieldControl
+                  control="input"
+                  id="email"
+                  type="email"
+                  className="form-control FormInput input-field "
+                  name="email"
+                  placeholder="Email"
+                  required=""
+                  autoComplete="email"
+                  autoFocus=""
+                />
+              </div>
+              <Row>
+                <Col>
+                  <div className="form-group">
+                    <FieldControl
+                      control="input"
+                      id="password"
+                      type="password"
+                      className="form-control FormInput input-field "
+                      name="password"
+                      placeholder="Password"
+                      required=""
+                      autoComplete="password"
+                      autoFocus=""
+                    />
+                  </div>
+                </Col>
+                <Col>
+                  <div className="form-group">
+                    <FieldControl
+                      control="input"
+                      id="confirm_password"
+                      type="password"
+                      className="form-control FormInput input-field "
+                      name="confirm_password"
+                      placeholder="Confirm Password"
+                      required=""
+                      autoComplete="confirm_password"
+                      autoFocus=""
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <div className="form-group">
+                <FieldControl
+                  control="input"
+                  id="address"
+                  type="text"
+                  className="form-control FormInput input-field "
+                  name="address"
+                  placeholder="Address"
+                  required=""
+                  autoComplete="address"
+                  autoFocus=""
+                />
+              </div>
 
-            <Row>
-              <Col>
-                <Form.Label className="FormLabel">Password</Form.Label>
-                <div>
-                  <input
-                    required
-                    className="FormInput "
-                    type="password"
-                    name="password"
-                    onChange={this.changeHandler}
-                    value={password}
-                  />
-                </div>
-              </Col>
-              <Col>
-                <Form.Label className="FormLabel">Confirm Password</Form.Label>
-                <div>
-                  <input
-                    required
-                    className="FormInput"
-                    type="password"
-                    name="confirm_password"
-                    onChange={this.changeHandler}
-                    value={confirm_password}
-                  />
-                </div>
-              </Col>
-            </Row>
+              <div className="form-group">
+                <FieldControl
+                  control="input"
+                  id="street_address"
+                  type="text"
+                  className="form-control FormInput input-field "
+                  name="street_address"
+                  placeholder="Street Address"
+                  required=""
+                  autoComplete="street_address"
+                  autoFocus=""
+                />
+              </div>
 
-            <Form.Label className="FormLabel">Address</Form.Label>
-            <div>
-              <input
-                required
-                className="FormInput  FormInputWidth"
-                type="text"
-                name="address"
-                onChange={this.changeHandler}
-                value={address}
-              />
-            </div>
-            <Form.Label className="FormLabel">Street Address</Form.Label>
-            <div>
-              <input
-                required
-                className="FormInput FormInputWidth"
-                type="text"
-                name="street_address"
-                onChange={this.changeHandler}
-                value={street_adress}
-              />
-            </div>
+              <div className="map">
+                <LocationPicker
+                  containerElement={<div style={{ height: "100%" }} />}
+                  mapElement={<div style={{ height: "400px" }} />}
+                  defaultPosition={defaultPosition}
+                  // onChange={this.handleLocationChange}
+                  name="Location"
+                  // value={address_map}
+                />
+              </div>
 
-            <div className="map">
-              <LocationPicker
-                containerElement={<div style={{ height: "100%" }} />}
-                mapElement={<div style={{ height: "400px" }} />}
-                defaultPosition={defaultPosition}
-                onChange={this.handleLocationChange}
-                name="Location"
-                value={address_map}
-              />
-            </div>
-
-            <div className="SubmitButton">
-              <Button
-                className="SubmitButtonWidth"
-                variant="primary"
-                type="submit"
-              >
-                Submit
-              </Button>
-
-              <Button
-                className="SubmitButtonWidth"
-                variant="secondary"
-                href="./"
-              >
-                Cancel
-              </Button>
-            </div>
-          </Form>
+              <div className=" form-group SubmitButton">
+                <FieldControl
+                  control="button"
+                  type="submit"
+                  className="btnSubmit form-control SubmitButtonWidth"
+                  text="Submit"
+                />
+              </div>
+              <div className="SubmitButton">
+                <Button className=" form-control CancelButtonWidth" href="./">
+                  Cancel
+                </Button>
+              </div>
+            </Form>
+          </Formik>
         </Container>
       </div>
     );
   }
 }
-export default connect()(CreateUser);
+function mapState(state) {
+  return {
+    errorMessage: state.CreateUser.errorMessage,
+    loading: state.CreateUser.loading,
+    user: state.CreateUser.user,
+  };
+}
+export default connect(mapState, { CreateUserAction })(CreateUser);

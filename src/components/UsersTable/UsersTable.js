@@ -3,74 +3,47 @@ import ReactPaginate from "react-paginate";
 import { connect } from "react-redux";
 
 import "./UsersTable.scss";
-// import Pagination from "react-bootstrap/Pagination";
+import Pagination from "react-bootstrap/Pagination";
 
 import {
   ListUsersAction,
   ListUsersPagesAction,
 } from "../../actions/ListUsersAction/ListUsersAction";
 
-import { Table } from "../../UtilisComponents";
+import { Table } from "../SharedComponents";
 import { Button, Container } from "react-bootstrap";
 
 class UsersTable extends Component {
   componentDidMount() {
     this.props.ListUsersAction(this.props.pageNumber);
-
-    // const { user } = this.state;
-    // if (user && user.page) {
-    //   this.props.ListUsersAction(user.page);
-    console.log(this.props.pageNumber);
-    // }
   }
+
+  handlePages = () => {
+    this.props.ListUsersPagesAction();
+    console.log(this.props.ListUsersPagesAction);
+  };
 
   constructor(props) {
     super(props);
     this.state = {
       offset: 0,
-      // data: [],
+
       perPage: 6,
       currentPage: 0,
     };
-    this.handlePageClick = this.handlePageClick.bind(this);
   }
-
-  handlePageClick = (e) => {
-    const selectedPage = e.selected;
-    const offset = selectedPage * this.state.perPage;
-
-    this.setState(
-      {
-        currentPage: selectedPage,
-        offset: offset,
-      },
-      () => {
-        this.props.ListUsersPagesAction();
-      }
-    );
-  };
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     activePage: 1,
-  //   };
-  // }
-
-  // handlePageChange(pageNumber) {
-  //   console.log(`active page is ${pageNumber}`);
-  //   this.setState({ activePage: pageNumber });
-  // }
 
   render() {
     return (
       <Container fluid>
         <div className="Users_table">
           <div className="AddUserButton">
+            {/* Button for add new user  */}
             <Button href="./create-user" variant="primary">
               Add User
             </Button>
           </div>
-
+          {/* Table of Users  */}
           <div>
             <Table>
               <thead>
@@ -102,26 +75,49 @@ class UsersTable extends Component {
                 : this.props.errorMessage}
             </Table>
           </div>
-
+          {/* Trial 1 for pagination  */}
           <div>
             {this.props.list_of_users_pages &&
             this.props.list_of_users_pages.length
-              ? this.props.list_of_users_pages.map((page) => (
-                  <ReactPaginate
-                    previousLabel={"prev"}
-                    nextLabel={"next"}
-                    breakLabel={"..."}
-                    breakClassName={"break-me"}
-                    pageCount={page.total_pages}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={this.handlePageClick}
-                    containerClassName={"pagination"}
-                    subContainerClassName={"pages pagination"}
-                    activeClassName={"active"}
-                  />
-                ))
+              ? this.props.list_of_users_pages.map((pages) =>
+                  console.log(pages.total_pages)
+                )
               : this.props.errorMessage}
+
+            <Pagination className="PaginationDiv">
+              <Pagination.First />
+              <Pagination.Prev />
+              <Pagination.Item>{1}</Pagination.Item>
+              <Pagination.Ellipsis />
+
+              <Pagination.Item>{10}</Pagination.Item>
+              <Pagination.Item>{11}</Pagination.Item>
+              <Pagination.Item active>{12}</Pagination.Item>
+              <Pagination.Item>{13}</Pagination.Item>
+              <Pagination.Item disabled>{14}</Pagination.Item>
+
+              <Pagination.Ellipsis />
+              <Pagination.Item>{20}</Pagination.Item>
+              <Pagination.Next />
+              <Pagination.Last />
+            </Pagination>
+
+            {/* Trial 2 for pagination  */}
+
+            {/* <ReactPaginate
+              previousLabel={"prev"}
+              nextLabel={"next"}
+              breakLabel={"..."}
+              breakClassName={"break-me"}
+              pageCount={4}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={2}
+              onPageChange={ListUsersAction()}
+              containerClassName={"pagination"}
+              subContainerClassName={"pages pagination"}
+              activeClassName={"active"}
+
+            /> */}
           </div>
         </div>
       </Container>
